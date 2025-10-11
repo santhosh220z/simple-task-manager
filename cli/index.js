@@ -17,44 +17,6 @@ if (!command) {
   process.exit(0);
 }
 
-switch (command) {
-  case 'add':
-    const task = args.slice(1).join(' ');
-    if (!task) {
-      console.log('Usage: stm add <task description>');
-      process.exit(1);
-    }
-    addTask(task);
-    break;
-  case 'list':
-    listTasks();
-    break;
-  case 'remove':
-    const id = args[1];
-    if (!id) {
-      console.log('Usage: stm remove <id>');
-      process.exit(1);
-    }
-    removeTask(id);
-    break;
-  case 'export':
-    const format = args[1] || 'json';
-    exportTasks(format);
-    break;
-  case 'import':
-    const file = args[1];
-    if (!file) {
-      console.log('Usage: stm import <file>');
-      process.exit(1);
-    }
-    importTasks(file);
-    break;
-  default:
-    console.log('Unknown command:', command);
-    process.exit(1);
-}
-
-// Simple in-memory storage (replace with DB later)
 let tasks = [];
 const tasksFile = path.join(__dirname, '..', 'tasks.json');
 
@@ -135,4 +97,41 @@ function importTasks(file) {
   } catch (e) {
     console.log('Error importing tasks:', e.message);
   }
+}
+
+switch (command) {
+  case 'add':
+    const task = args.slice(1).join(' ');
+    if (!task) {
+      console.log('Usage: stm add <task description>');
+      process.exit(1);
+    }
+    addTask(task);
+    break;
+  case 'list':
+    listTasks();
+    break;
+  case 'remove':
+    const id = args[1];
+    if (!id) {
+      console.log('Usage: stm remove <id>');
+      process.exit(1);
+    }
+    removeTask(id);
+    break;
+  case 'export':
+    const format = args[1] || 'json';
+    exportTasks(format);
+    break;
+  case 'import':
+    const file = args[1];
+    if (!file) {
+      console.log('Usage: stm import <file>');
+      process.exit(1);
+    }
+    importTasks(file);
+    break;
+  default:
+    console.log('Unknown command:', command);
+    process.exit(1);
 }
