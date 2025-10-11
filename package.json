@@ -1,0 +1,16 @@
+{
+  "name": "simple-task-manager",
+  "version": "1.0.0",
+  "description": "A cross-platform task manager for developers with CLI and GUI interfaces",
+  "main": "cli/index.js",
+  "scripts": {
+    "cli": "node cli/index.js",
+    "gui": "cd gui && npm start",
+    "install-cli": "cd cli && npm install",
+    "install-gui": "cd gui && npm install",
+    "install-all": "npm run install-cli && npm run install-gui"
+  },
+  "keywords": ["task-manager", "cli", "gui", "cross-platform"],
+  "author": "",
+  "license": "MIT"
+}
