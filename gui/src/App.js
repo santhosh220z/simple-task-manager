@@ -33,27 +33,28 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+    <div className="min-h-screen bg-gray-900 text-white p-4">
+      <div className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-md p-6">
         <h1 className="text-2xl font-bold text-center mb-4">Simple Task Manager</h1>
         <div className="flex mb-4">
           <input
             type="text"
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && addTask()}
             placeholder="Add a new task"
-            className="flex-1 p-2 border border-gray-300 rounded-l"
+            className="flex-1 p-2 border border-gray-600 rounded-l bg-gray-700 text-white"
           />
           <button
             onClick={addTask}
-            className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+            className="bg-blue-600 text-white px-4 py-2 rounded-r hover:bg-blue-700"
           >
             Add
           </button>
         </div>
         <ul>
           {tasks.map(task => (
-            <li key={task.id} className="flex items-center justify-between p-2 border-b">
+            <li key={task.id} className="flex items-center justify-between p-2 border-b border-gray-600">
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -61,13 +62,13 @@ function App() {
                   onChange={() => toggleTask(task.id)}
                   className="mr-2"
                 />
-                <span className={task.done ? 'line-through text-gray-500' : ''}>
+                <span className={task.done ? 'line-through text-gray-400' : ''}>
                   {task.description}
                 </span>
               </div>
               <button
                 onClick={() => removeTask(task.id)}
-                className="text-red-500 hover:text-red-700"
+                className="text-red-400 hover:text-red-300"
               >
                 Remove
               </button>
