@@ -19,7 +19,7 @@
 ## Next Steps
 - [ ] Integrate SQLite database in CLI instead of JSON file
 - [ ] Add MongoDB sync layer (optional)
-- [ ] Enhance GUI with more features (edit tasks, categories)
+- [ ] Enhance GUI with more features (categories)
 - [ ] Add notifications and calendar views
 - [ ] Implement plugin support
 - [ ] Test cross-platform compatibility
