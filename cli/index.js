@@ -21,6 +21,7 @@ if (!command) {
 let tasks = [];
 const tasksFile = path.join(__dirname, '..', 'tasks.json');
 let timerStart = null;
+let timerInterval = null;
 
 function loadTasks() {
   if (fs.existsSync(tasksFile)) {
