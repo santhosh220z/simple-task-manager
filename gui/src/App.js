@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Calendar, dateFnsLocalizer } from 'react-calendar';
-import { format, parse, startOfWeek, getDay } from 'date-fns';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -83,21 +82,12 @@ function App() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const calendarEvents = tasks.filter(task => task.due_date).map(task => ({
-    id: task.id,
-    title: task.description,
-    start: new Date(task.due_date),
-    end: new Date(task.due_date),
-    allDay: true
-  }));
-
-  const localizer = dateFnsLocalizer({
-    format,
-    parse,
-    startOfWeek,
-    getDay,
-    locales: { 'en-US': require('date-fns/locale/en-US') }
-  });
+  const tileContent = ({ date, view }) => {
+    if (view === 'month') {
+      const tasksOnDate = tasks.filter(task => task.due_date === date.toISOString().split('T')[0]);
+      return tasksOnDate.length > 0 ? <div className="text-xs text-blue-400">{tasksOnDate.length} task(s)</div> : null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-4">
@@ -196,12 +186,8 @@ function App() {
         {view === 'calendar' && (
           <div className="mb-6">
             <Calendar
-              localizer={localizer}
-              events={calendarEvents}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 500 }}
-              className="bg-gray-700 text-white"
+              tileContent={tileContent}
+              className="bg-gray-700 text-white border-gray-600"
             />
           </div>
         )}
