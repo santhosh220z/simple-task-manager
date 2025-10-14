@@ -1,4 +1,5 @@
 // Shared utilities for export/import
+mmoit g// Shared utilities for export/import
 // Cross-platform compatible
 
 const fs = require('fs');
@@ -17,9 +18,9 @@ function importFromJSON(filePath) {
 }
 
 function exportToCSV(tasks, filePath) {
-  let csv = 'id,description,done,created_at,updated_at\n';
+  let csv = 'id,description,done,created_at,updated_at,due_date,reminder_time\n';
   tasks.forEach(task => {
-    csv += `${task.id},"${task.description}",${task.done},"${task.created_at}","${task.updated_at}"\n`;
+    csv += `${task.id},"${task.description}",${task.done},"${task.created_at}","${task.updated_at}","${task.due_date || ''}","${task.reminder_time || ''}"\n`;
   });
   fs.writeFileSync(filePath, csv, 'utf8');
   console.log(`Exported to ${filePath}`);
