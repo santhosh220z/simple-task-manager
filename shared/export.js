@@ -1,6 +1,4 @@
 // Shared utilities for export/import
-mmoit g// Shared utilities for export/import
-// Cross-platform compatible
 
 const fs = require('fs');
 const path = require('path');
@@ -31,13 +29,15 @@ function importFromCSV(filePath) {
   const data = fs.readFileSync(filePath, 'utf8');
   const lines = data.split('\n').slice(1);
   return lines.filter(line => line.trim()).map(line => {
-    const [id, description, done, created_at, updated_at] = line.split(',');
+    const [id, description, done, created_at, updated_at, due_date, reminder_time] = line.split(',');
     return {
       id: parseInt(id),
       description: description.replace(/"/g, ''),
       done: done === 'true',
       created_at: created_at.replace(/"/g, ''),
-      updated_at: updated_at.replace(/"/g, '')
+      updated_at: updated_at.replace(/"/g, ''),
+      due_date: due_date ? due_date.replace(/"/g, '') : null,
+      reminder_time: reminder_time ? reminder_time.replace(/"/g, '') : null
     };
   });
 }

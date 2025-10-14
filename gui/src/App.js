@@ -1,8 +1,18 @@
 import { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
+  const [dueDate, setDueDate] = useState(null);
+  const [reminderTime, setReminderTime] = useState(null);
+  const [view, setView] = useState('list'); // 'list' or 'calendar'
+  const [timer, setTimer] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
 
   // Load tasks from localStorage (later replace with DB)
   useEffect(() => {

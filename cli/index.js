@@ -13,12 +13,13 @@ const command = args[0];
 if (!command) {
   console.log('Simple Task Manager CLI');
   console.log('Usage: stm <command> [options]');
-  console.log('Commands: add, list, remove, export, import');
+  console.log('Commands: add, list, remove, export, import, timer');
   process.exit(0);
 }
 
 let tasks = [];
 const tasksFile = path.join(__dirname, '..', 'tasks.json');
+let timerStart = null;
 
 function loadTasks() {
   if (fs.existsSync(tasksFile)) {
@@ -30,10 +31,13 @@ function saveTasks() {
   fs.writeFileSync(tasksFile, JSON.stringify(tasks, null, 2));
 }
 
-function addTask(description) {
+function addTask(description, dueDate, reminderTime) {
   loadTasks();
   const id = tasks.length + 1;
-  tasks.push({ id, description, done: false });
+  const task = { id, description, done: false };
+  if (dueDate) task.due_date = dueDate;
+  if (reminderTime) task.reminder_time = reminderTime;
+  tasks.push(task);
   saveTasks();
   console.log(`Task added: ${description}`);
 }
@@ -45,7 +49,7 @@ function listTasks() {
     return;
   }
   tasks.forEach(task => {
-    console.log(`${task.id}. [${task.done ? 'x' : ' '}] ${task.description}`);
+    console.log(`${task.id}. [${task.done ? 'x' : ' '}] ${task.description}${task.due_date ? ` (Due: ${task.due_date})` : ''}${task.reminder_time ? ` (Reminder: ${task.reminder_time})` : ''}`);
   });
 }
 
@@ -66,9 +70,9 @@ function exportTasks(format) {
   if (format === 'json') {
     console.log(JSON.stringify(tasks, null, 2));
   } else if (format === 'csv') {
-    console.log('id,description,done');
+    console.log('id,description,done,due_date,reminder_time');
     tasks.forEach(task => {
-      console.log(`${task.id},"${task.description}",${task.done}`);
+      console.log(`${task.id},"${task.description}",${task.done},"${task.due_date || ''}","${task.reminder_time || ''}"`);
     });
   } else {
     console.log('Unsupported format. Use json or csv.');
@@ -88,8 +92,14 @@ function importTasks(file) {
       // Simple CSV parse
       const lines = data.split('\n').slice(1);
       tasks = lines.map(line => {
-        const [id, description, done] = line.split(',');
-        return { id: parseInt(id), description: description.replace(/"/g, ''), done: done === 'true' };
+        const [id, description, done, due_date, reminder_time] = line.split(',');
+        return {
+          id: parseInt(id),
+          description: description.replace(/"/g, ''),
+          done: done === 'true',
+          due_date: due_date ? due_date.replace(/"/g, '') : null,
+          reminder_time: reminder_time ? reminder_time.replace(/"/g, '') : null
+        };
       });
     }
     saveTasks();
@@ -99,14 +109,41 @@ function importTasks(file) {
   }
 }
 
+function startTimer() {
+  timerStart = Date.now();
+  console.log('Timer started.');
+}
+
+function stopTimer() {
+  if (!timerStart) {
+    console.log('No timer running.');
+    return;
+  }
+  const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+  console.log(`Timer stopped. Elapsed time: ${elapsed} seconds.`);
+  timerStart = null;
+}
+
+function timerStatus() {
+  if (!timerStart) {
+    console.log('No timer running.');
+    return;
+  }
+  const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+  console.log(`Timer running. Elapsed time: ${elapsed} seconds.`);
+}
+
 switch (command) {
   case 'add':
-    const task = args.slice(1).join(' ');
-    if (!task) {
-      console.log('Usage: stm add <task description>');
+    const taskArgs = args.slice(1);
+    const description = taskArgs[0];
+    const dueDate = taskArgs.find(arg => arg.startsWith('--due='))?.split('=')[1];
+    const reminderTime = taskArgs.find(arg => arg.startsWith('--reminder='))?.split('=')[1];
+    if (!description) {
+      console.log('Usage: stm add <task description> [--due=YYYY-MM-DD] [--reminder=YYYY-MM-DDTHH:MM]');
       process.exit(1);
     }
-    addTask(task);
+    addTask(description, dueDate, reminderTime);
     break;
   case 'list':
     listTasks();
@@ -130,6 +167,18 @@ switch (command) {
       process.exit(1);
     }
     importTasks(file);
+    break;
+  case 'timer':
+    const timerCmd = args[1];
+    if (timerCmd === 'start') {
+      startTimer();
+    } else if (timerCmd === 'stop') {
+      stopTimer();
+    } else if (timerCmd === 'status') {
+      timerStatus();
+    } else {
+      console.log('Usage: stm timer <start|stop|status>');
+    }
     break;
   default:
     console.log('Unknown command:', command);
