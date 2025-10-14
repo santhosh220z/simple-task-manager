@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import { Calendar, dateFnsLocalizer } from 'react-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -161,33 +161,76 @@ function App() {
                 </button>
               </div>
             </div>
-        <ul className="space-y-2">
-          {tasks.map(task => (
-            <li key={task.id} className="flex items-center justify-between p-4 bg-gray-700/50 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={task.done}
-                  onChange={() => toggleTask(task.id)}
-                  className="mr-3 w-5 h-5 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <span className={`text-lg ${task.done ? 'line-through text-gray-400' : 'text-gray-100'}`}>
-                  {task.description}
-                </span>
-              </div>
+            <ul className="space-y-2">
+              {tasks.map(task => (
+                <li key={task.id} className="flex items-center justify-between p-4 bg-gray-700/50 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={task.done}
+                      onChange={() => toggleTask(task.id)}
+                      className="mr-3 w-5 h-5 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <span className={`text-lg ${task.done ? 'line-through text-gray-400' : 'text-gray-100'}`}>
+                      {task.description}
+                      {task.due_date && <span className="text-sm text-yellow-400 ml-2">(Due: {task.due_date})</span>}
+                      {task.reminder_time && <span className="text-sm text-blue-400 ml-2">(Reminder: {new Date(task.reminder_time).toLocaleString()})</span>}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => removeTask(task.id)}
+                    className="text-red-400 hover:text-red-300 p-2 rounded-full hover:bg-red-500/20 transition-all duration-200"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </li>
+              ))}
+              {tasks.length === 0 && (
+                <p className="text-center text-gray-400 mt-8">No tasks yet. Add one above!</p>
+              )}
+            </ul>
+          </>
+        )}
+        {view === 'calendar' && (
+          <div className="mb-6">
+            <Calendar
+              localizer={localizer}
+              events={calendarEvents}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ height: 500 }}
+              className="bg-gray-700 text-white"
+            />
+          </div>
+        )}
+        {view === 'timer' && (
+          <div className="text-center">
+            <div className="text-6xl font-mono mb-8">{formatTime(timer)}</div>
+            <div className="space-x-4">
               <button
-                onClick={() => removeTask(task.id)}
-                className="text-red-400 hover:text-red-300 p-2 rounded-full hover:bg-red-500/20 transition-all duration-200"
+                onClick={startTimer}
+                disabled={timerRunning}
+                className="bg-green-600 text-white px-6 py-3 rounded disabled:opacity-50"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+                Start
               </button>
-            </li>
-          ))}
-        </ul>
-        {tasks.length === 0 && (
-          <p className="text-center text-gray-400 mt-8">No tasks yet. Add one above!</p>
+              <button
+                onClick={stopTimer}
+                disabled={!timerRunning}
+                className="bg-red-600 text-white px-6 py-3 rounded disabled:opacity-50"
+              >
+                Stop
+              </button>
+              <button
+                onClick={resetTimer}
+                className="bg-blue-600 text-white px-6 py-3 rounded"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
