@@ -12,6 +12,10 @@ function App() {
   const [view, setView] = useState('list'); // 'list' or 'calendar'
   const [timer, setTimer] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editingDescription, setEditingDescription] = useState('');
+  const [editingDueDate, setEditingDueDate] = useState(null);
+  const [editingReminder, setEditingReminder] = useState(null);
 
   // Load tasks from localStorage (later replace with DB)
   useEffect(() => {
@@ -61,6 +65,39 @@ function App() {
 
   const removeTask = (id) => {
     setTasks(tasks.filter(task => task.id !== id));
+  };
+
+  const editTask = (task) => {
+    setEditingTaskId(task.id);
+    setEditingDescription(task.description);
+    setEditingDueDate(task.due_date ? new Date(task.due_date) : null);
+    setEditingReminder(task.reminder_time ? new Date(task.reminder_time) : null);
+  };
+
+  const saveEdit = () => {
+    if (editingDescription.trim()) {
+      setTasks(tasks.map(task =>
+        task.id === editingTaskId
+          ? {
+              ...task,
+              description: editingDescription,
+              due_date: editingDueDate ? editingDueDate.toISOString().split('T')[0] : null,
+              reminder_time: editingReminder ? editingReminder.toISOString() : null
+            }
+          : task
+      ));
+      setEditingTaskId(null);
+      setEditingDescription('');
+      setEditingDueDate(null);
+      setEditingReminder(null);
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingTaskId(null);
+    setEditingDescription('');
+    setEditingDueDate(null);
+    setEditingReminder(null);
   };
 
   const startTimer = () => {

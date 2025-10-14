@@ -5,6 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { exportToJSON, importFromJSON, exportToCSV, importFromCSV } = require('../shared/export');
 
 // Basic argument parsing
 const args = process.argv.slice(2);
@@ -33,7 +34,7 @@ function saveTasks() {
 
 function addTask(description, dueDate, reminderTime) {
   loadTasks();
-  const id = tasks.length + 1;
+  const id = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
   const task = { id, description, done: false };
   if (dueDate) task.due_date = dueDate;
   if (reminderTime) task.reminder_time = reminderTime;
@@ -67,40 +68,26 @@ function removeTask(id) {
 
 function exportTasks(format) {
   loadTasks();
+  const fileName = `tasks.${format}`;
+  const filePath = path.join(process.cwd(), fileName);
   if (format === 'json') {
-    console.log(JSON.stringify(tasks, null, 2));
+    exportToJSON(tasks, filePath);
   } else if (format === 'csv') {
-    console.log('id,description,done,due_date,reminder_time');
-    tasks.forEach(task => {
-      console.log(`${task.id},"${task.description}",${task.done},"${task.due_date || ''}","${task.reminder_time || ''}"`);
-    });
+    exportToCSV(tasks, filePath);
   } else {
     console.log('Unsupported format. Use json or csv.');
   }
 }
 
 function importTasks(file) {
-  if (!fs.existsSync(file)) {
-    console.log('File not found.');
-    return;
-  }
-  const data = fs.readFileSync(file, 'utf8');
   try {
     if (file.endsWith('.json')) {
-      tasks = JSON.parse(data);
+      tasks = importFromJSON(file);
     } else if (file.endsWith('.csv')) {
-      // Simple CSV parse
-      const lines = data.split('\n').slice(1);
-      tasks = lines.map(line => {
-        const [id, description, done, due_date, reminder_time] = line.split(',');
-        return {
-          id: parseInt(id),
-          description: description.replace(/"/g, ''),
-          done: done === 'true',
-          due_date: due_date ? due_date.replace(/"/g, '') : null,
-          reminder_time: reminder_time ? reminder_time.replace(/"/g, '') : null
-        };
-      });
+      tasks = importFromCSV(file);
+    } else {
+      console.log('Unsupported file format. Please use .json or .csv');
+      return;
     }
     saveTasks();
     console.log('Tasks imported.');
