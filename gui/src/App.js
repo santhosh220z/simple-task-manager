@@ -27,10 +27,32 @@ function App() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }, [tasks]);
 
+  // Timer effect
+  useEffect(() => {
+    let interval = null;
+    if (timerRunning) {
+      interval = setInterval(() => {
+        setTimer(timer => timer + 1);
+      }, 1000);
+    } else if (!timerRunning && timer !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [timerRunning, timer]);
+
   const addTask = () => {
     if (newTask.trim()) {
-      setTasks([...tasks, { id: Date.now(), description: newTask, done: false }]);
+      const task = {
+        id: Date.now(),
+        description: newTask,
+        done: false,
+        due_date: dueDate ? dueDate.toISOString().split('T')[0] : null,
+        reminder_time: reminderTime ? reminderTime.toISOString() : null
+      };
+      setTasks([...tasks, task]);
       setNewTask('');
+      setDueDate(null);
+      setReminderTime(null);
     }
   };
 
@@ -42,30 +64,103 @@ function App() {
     setTasks(tasks.filter(task => task.id !== id));
   };
 
+  const startTimer = () => {
+    setTimerRunning(true);
+  };
+
+  const stopTimer = () => {
+    setTimerRunning(false);
+  };
+
+  const resetTimer = () => {
+    setTimer(0);
+    setTimerRunning(false);
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const calendarEvents = tasks.filter(task => task.due_date).map(task => ({
+    id: task.id,
+    title: task.description,
+    start: new Date(task.due_date),
+    end: new Date(task.due_date),
+    allDay: true
+  }));
+
+  const localizer = dateFnsLocalizer({
+    format,
+    parse,
+    startOfWeek,
+    getDay,
+    locales: { 'en-US': require('date-fns/locale/en-US') }
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-4">
       <div className="max-w-lg mx-auto bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-gray-700">
         <h1 className="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
           Simple Task Manager
         </h1>
-        <div className="flex mb-6 shadow-lg">
-          <input
-            type="text"
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && addTask()}
-            placeholder="Add a new task..."
-            className="flex-1 p-3 border border-gray-600 rounded-l-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          />
+        <div className="flex mb-4">
           <button
-            onClick={addTask}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-r-lg hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg"
+            onClick={() => setView('list')}
+            className={`px-4 py-2 rounded-l-lg ${view === 'list' ? 'bg-blue-600' : 'bg-gray-700'} text-white`}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            List
+          </button>
+          <button
+            onClick={() => setView('calendar')}
+            className={`px-4 py-2 ${view === 'calendar' ? 'bg-blue-600' : 'bg-gray-700'} text-white`}
+          >
+            Calendar
+          </button>
+          <button
+            onClick={() => setView('timer')}
+            className={`px-4 py-2 rounded-r-lg ${view === 'timer' ? 'bg-blue-600' : 'bg-gray-700'} text-white`}
+          >
+            Timer
           </button>
         </div>
+        {view === 'list' && (
+          <>
+            <div className="mb-6 shadow-lg">
+              <input
+                type="text"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && addTask()}
+                placeholder="Add a new task..."
+                className="w-full p-3 mb-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              />
+              <div className="flex space-x-2">
+                <DatePicker
+                  selected={dueDate}
+                  onChange={setDueDate}
+                  placeholderText="Due Date"
+                  className="flex-1 p-2 border border-gray-600 rounded bg-gray-700 text-white"
+                />
+                <DatePicker
+                  selected={reminderTime}
+                  onChange={setReminderTime}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="yyyy-MM-dd HH:mm"
+                  placeholderText="Reminder"
+                  className="flex-1 p-2 border border-gray-600 rounded bg-gray-700 text-white"
+                />
+                <button
+                  onClick={addTask}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
         <ul className="space-y-2">
           {tasks.map(task => (
             <li key={task.id} className="flex items-center justify-between p-4 bg-gray-700/50 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
