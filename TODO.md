@@ -8,13 +8,13 @@
 - [x] Set up SQLite schema
 - [x] Create shared export/import utilities
 
-## In Progress: Add Reminder Time, Calendar, and Timer Functionality
-- [ ] Update db/schema.sql to add due_date and reminder_time fields
-- [ ] Update shared/export.js to include new fields in export/import
-- [ ] Update cli/index.js to accept due dates/reminders in add command, add timer commands (start, stop, status)
-- [ ] Update gui/src/App.js to add due date/reminder inputs, calendar view toggle, timer component
-- [ ] Install necessary dependencies (e.g., date picker for GUI, notification libraries)
-- [ ] Update TODO.md to reflect new features
+## Completed: Add Reminder Time, Calendar, and Timer Functionality
+- [x] Update db/schema.sql to add due_date and reminder_time fields
+- [x] Update shared/export.js to include new fields in export/import
+- [x] Update cli/index.js to accept due dates/reminders in add command, add timer commands (start, stop, status)
+- [x] Update gui/src/App.js to add due date/reminder inputs, calendar view toggle, timer component
+- [x] Install necessary dependencies (e.g., date picker for GUI, notification libraries)
+- [x] Update TODO.md to reflect new features
 
 ## Next Steps
 - [ ] Integrate SQLite database in CLI instead of JSON file
