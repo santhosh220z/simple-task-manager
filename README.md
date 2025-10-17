@@ -51,4 +51,3 @@ Note: Database (SQLite) is local; for production, consider cloud sync with Mongo
 ## Contributing
 
 Maintain modularity, clarity, and cross-platform compatibility.
-updated some fratures
