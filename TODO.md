@@ -1,4 +1,4 @@
-hbfqwiiubfdiqweubde# Simple Task Manager TODO
+# Simple Task Manager TODO
 
 ## Completed
 - [x] Create project structure (cli/, gui/, db/, shared/)
