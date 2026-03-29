@@ -4,6 +4,8 @@ A lightweight, cross-platform task manager designed for developers working acros
 
 ## Features
 
+
+
 - **CLI Interface**: Node.js-based, minimal and import-free for quick operations.
 - **GUI Dashboard**: React-based with Tailwind CSS for a modern interface.
 - **Database**: SQLite for local storage, with optional MongoDB sync.
