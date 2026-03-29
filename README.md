@@ -1,8 +1,5 @@
 # Simple Task Manager
 
-
-
-
 A lightweight, cross-platform task manager designed for developers working across Windows and Linux environments. Features both a CLI interface and a GUI dashboard, with modular architecture and offline sync capabilities.
 
 ## Features
